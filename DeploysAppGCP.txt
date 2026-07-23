@@ -1,0 +1,28 @@
+
+## Baixando a imagem 
+git clone https://github.com/denilsondjones/postit
+
+cd postit
+
+## Pussh da imagem local para o Artifact Registry
+
+cloudbuild.yaml
+
+steps:
+- name: 'gcr.io/go-containerregistry/crane'
+  args: ['push', 'postit.tar', 'us-central1-docker.pkg.dev/digitallab01/post-it-repo/postit:v1']
+
+gcloud builds submit --config=cloudbuild.yaml .
+
+## Criando o cloud run
+
+gcloud run deploy digitalpostit-service \
+    --image=us-central1-docker.pkg.dev/digitallab01/post-it-repo/postit:v1 \
+    --platform=managed \
+    --region=us-central1 \
+    --allow-unauthenticated \
+    --port=80 \
+    --min-instances=0 \
+    --max-instances=2 \
+    --cpu=0.25 \
+    --memory=128Mi
